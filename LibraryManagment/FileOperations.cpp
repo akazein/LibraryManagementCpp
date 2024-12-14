@@ -2,11 +2,13 @@
 #include "FileOperations.h"
 #include "Book.h"
 
-bool appendFile(const char gino[]) {
+//BASIC FILE OPERATIONS
+
+bool overwriteFile(const char data[]) {
 	std::ofstream os(FILE_NAME);
-    int length = std::strlen(gino);
+    int length = std::strlen(data);
 	if (os.is_open()) {
-		os.write(gino, length);
+		os.write(data, length);
         os.close();
 		return true;
     }
@@ -14,45 +16,21 @@ bool appendFile(const char gino[]) {
     return false;
     
 }
-/*
 
-bool readFile() {
-    std::ifstream os(FILE_NAME);
+
+bool appendToFile(std::string dataStr) {
+    const char *data = dataStr.c_str();
+    std::ofstream os(FILE_NAME, std::ios::app);
+    int length = std::strlen(data);
     if (os.is_open()) {
-        std::string fileText;
-        os.seekg(0, std::ios::end);
-        fileText.reserve(os.tellg());
-        os.seekg(0, std::ios::beg);
-        fileText.assign(std::istreambuf_iterator<char>(os),
-        std::istreambuf_iterator<char>());
-        std::cout << fileText + "\n";
-        os.close(); 
+        os.write(data, length);
+        os.close();
         return true;
     }
 
-    std::cerr << "Error: can't open file\n";
     return false;
+
 }
-
-
-*/
-
-bool saveBooksToFile(std::vector<Book> arrBooksObj) {
-    const int arrBooksObjSize = arrBooksObj.size();
-    std::string booksStr ="";
-    int i = 0;
-    for (i = 0; i < arrBooksObj.size(); i++) {
-        booksStr += arrBooksObj[i].serialize();
-    }
-    booksStr += "\n";
-    const char* charArray = booksStr.c_str();
-
-    return appendFile(charArray);
-
-
-    
-}
-
 
 
 std::string readTextFromFile() {
@@ -76,3 +54,50 @@ std::string readTextFromFile() {
 }
 
 
+
+
+
+//FUNCTIONS THAT CALL BASIC FILE OPERATIONS
+
+bool saveBooksArrToFile(std::vector<Book> arrBooksObj) {
+    const int arrBooksObjSize = arrBooksObj.size();
+    std::string booksStr ="";
+    int i = 0;
+    for (i = 0; i < arrBooksObj.size(); i++) {
+        booksStr += arrBooksObj[i].serialize();
+    }
+    booksStr += "\n";
+    const char* charArray = booksStr.c_str();
+
+    return overwriteFile(charArray);
+
+
+    
+}
+
+
+bool addBookToFile(Book book) {
+    std::string serializedBook = book.serialize();
+    return appendToFile(serializedBook);
+}
+
+
+std::vector<Book> getArrBooksObjFromFile() {
+    Book book;
+    size_t posBreakChar;
+    int i = 0;
+    std::string subStringTextFile;
+    std::vector<Book> arrBooks;
+    std::string textFile = readTextFromFile();
+    int bookAmount = std::count(textFile.begin(), textFile.end(), '#');
+
+    for (i = 0; i < bookAmount; i++) {
+        textFile.erase(0, 1);
+        posBreakChar = textFile.find_first_of('#');
+        subStringTextFile = textFile.substr(0, posBreakChar);
+        textFile.erase(0, posBreakChar);
+        book = Book::deSerialize(subStringTextFile);
+        arrBooks.push_back(book);
+    }
+    return arrBooks;
+}

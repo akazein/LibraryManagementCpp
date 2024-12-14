@@ -4,53 +4,58 @@
 #include "Header.h"
 
 
+std::vector<Book> populateBooksArr() {
+	std::vector<Book> arrBooks;
+	std::string titlePrefixes[] = { "The Adventures of", "Mystery of", "Chronicles of", "The Legend of", "Tales from" };
+	std::string titleSubjects[] = { "the Lost City", "the Brave Warrior", "the Hidden Treasure", "the Haunted Castle", "the Wise Sage" };
+	std::string descThemes[] = { "A thrilling journey.", "A spine-chilling mystery.", "An epic saga.", "A heartwarming tale.", "A fascinating exploration." };
+	std::string borrowedNames[] = { "Alice", "Bob", "Charlie", "Diana", "Ethan", "Fiona", "George", "Hannah", "Ian", "Julia" };
+
+	for (int i = 0; i < 10; i++) {
+		// Generate random indices for creative fields
+		int titlePrefixIndex = i % 5; // Cycle through prefixes
+		int titleSubjectIndex = (i + 2) % 5; // Offset for variety
+		int descThemeIndex = (i + 3) % 5; // Another offset
+		int borrowerIndex = i % 10; // Cycle through borrower names
+
+		// Construct book details
+		std::string title = titlePrefixes[titlePrefixIndex] + " " + titleSubjects[titleSubjectIndex];
+		std::string description = descThemes[descThemeIndex];
+		std::string borrowedBy = borrowedNames[borrowerIndex];
+
+		// Create a Book object and add it to the vector
+		Book book(title, description, borrowedBy, i);
+		arrBooks.push_back(book);
+	}
+	return arrBooks;
+}
+
+void printAllBooks(std::vector<Book> arrBooks) {
+	int i = 0;
+	for (i = 0; i < arrBooks.size(); i++) {
+		arrBooks[i].toString();
+		std::cout << "\n\n";
+
+	}
+}
+
 int main() {
 	
 	std::vector<Book> arrBooks;
 	int i = 0;
-	Book book;
-	for (i = 0; i < 10; i++) {
-		book = Book("title" + std::to_string(i), "desc" + std::to_string(i), "whoborrowed" + std::to_string(i), i);
-		arrBooks.push_back(book);
+	
 
-	}
-	book = Book();
 
-	saveBooksToFile(arrBooks);
+	arrBooks = populateBooksArr();
 
 	arrBooks.clear();
 
-	std::string textFile = readTextFromFile();
-	int bookAmount = std::count(textFile.begin(), textFile.end(), '#');
+	arrBooks = getArrBooksObjFromFile();
 
+	printAllBooks(arrBooks);
 
-	std::cout << std::to_string(bookAmount) + "\n";
+	
 
-	size_t posBreakChar;
-	std::string subStringTextFile;
-
-
-	for (i = 0; i < bookAmount; i++) {
-		textFile.erase(0,1);
-		posBreakChar = textFile.find_first_of('#');
-		subStringTextFile = textFile.substr(0, posBreakChar);
-		textFile.erase(0, posBreakChar);
-		book = Book::deSerialize(subStringTextFile);
-		arrBooks.push_back(book);
-	}
-
-
-
-
-	for (i = 0; i < arrBooks.size(); i++) {
-		arrBooks[i].toString();
-		
-	}
-
-
-
-
-	//std::cout << readFile() + "\n";
-
+	std::cin.get();
 	return 0;
 }
